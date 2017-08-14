@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+    "fmt"
+    "strings"
+)
 
 func main() {
-    fmt.Printf("hello, world\n")
+    s := "абв"
+    fmt.Println(len(s))
+
+    /*for _, r := range s {
+        fmt.Printf("%c\n", r)
+    }*/
+
+    fmt.Println(strings.HasPrefix(s, "а"))
 }
