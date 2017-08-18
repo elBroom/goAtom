@@ -4,31 +4,41 @@ import (
 	"fmt"
 	"bufio"
 	"os"
-	"time"
 )
 
-const numRoutins = 2
-var ch = make(chan string, numRoutins)
-
-func main() {
-	for i := 1; i <= numRoutins; i++ {
-		go worker(i)
-	}
-
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		input, _ := reader.ReadString('\n')
-		ch <- input
+func worker(id int, jobs <-chan string, results chan <- tmp) {
+	for j := range jobs {
+		results <- tmp{id, j}
 	}
 }
 
-func worker(i int)  {
-	fmt.Printf("Start routine %d\n", i)
-	for {
-		input := <-ch
-		fmt.Printf("Work routine %d\n", i)
-		fmt.Printf("input: %s", input)
-		time.Sleep(5000 * time.Millisecond)
-		fmt.Printf("Finish routine with input: %s", input)
+type tmp struct {
+	id int
+	name string
+}
+
+func main() {
+	jobs := make(chan string, 10)
+	results := make(chan tmp, 10)
+	nWorkers := 3
+
+	for w := 1; w <= nWorkers; w++ {
+		go worker(w, jobs, results)
 	}
+
+	reader := bufio.NewReader(os.Stdin)
+	for i := 0; i <= 3; i++ {
+		input, error := reader.ReadString('\n')
+		if error != nil {
+			panic("AAAAAAAAAAA")
+		}
+		jobs <- input
+	}
+
+	for t := 0; t<= 3; t++ {
+		variable := <- results
+		fmt.Print(variable)
+	}
+
+
 }
