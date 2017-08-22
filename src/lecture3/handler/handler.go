@@ -18,12 +18,8 @@ type Data struct {
 }
 
 var users = []model.User{
-	model.User{
-		ID: "1", Login: "user1", Password: "password1",
-		Database: [](*model.Database){&model.Database{Name: "Database1"}},
-		Query: [](*model.Query){&model.Query{Time: 123, Query: "Query"}},
-	},
-	model.User{ID: "2", Login: "user2", Password: "password2"},
+	model.User{ID: 1, Login: "user1", Password: "password1"},
+	model.User{ID: 2, Login: "user2", Password: "password2"},
 }
 
 var data = []Data{}
