@@ -1,7 +1,17 @@
 package model
 
+import (
+	"github.com/jinzhu/gorm"
+)
+
 type User struct {
-	ID        	int   	`json:"id,omitempty"`
-	Login		string   	`json:"login,omitempty"`
-	Password  	string   	`json:"password,omitempty"`
+	gorm.Model
+
+	Login            string `gorm:"type:varchar(64);unique_index"`
+	Password         string
+	Name             string
+}
+
+func (User) TableName() string {
+	return "user"
 }

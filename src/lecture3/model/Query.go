@@ -1,7 +1,16 @@
 package model
 
+import (
+	"github.com/jinzhu/gorm"
+)
+
 type Query struct {
-	Time 		int 		`json:"name,omitempty"`
-	//Database   	*Database 	`json:"database,omitempty"`
-	Query  		string 		`json:"name,omitempty"`
+	gorm.Model
+
+	Query            string
+	Database 		 Database 	`gorm:"ForeignKey:DatabaseID"`
+}
+
+func (Query) TableName() string {
+	return "query"
 }

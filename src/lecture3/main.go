@@ -4,13 +4,15 @@ import (
 	"./server"
 	"./db"
 	"log"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	db_connect := db.Init()
-	defer db_connect.Close()
+	sqlite_connect := db.Sqlite_connect()
+	defer sqlite_connect.Close()
 
+	redis_connect := db.Redis_init()
+	defer redis_connect.Close()
+
+	log.Println("Start server: 127.0.0.1:8080")
 	log.Fatal(server.RunHTTPServer(":8080"))
 }
