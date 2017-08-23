@@ -6,16 +6,19 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"../model"
 	"../schema"
 	"../config"
 	"../db"
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
+	"log"
+	"math/rand"
 )
 
 var redis_connect = db.Redis_init()
-//var sqlite_connect = db.Sqlite_connect()
+var sqlite_connect = db.Sqlite_connect()
 
 // Создать значение
 func CreateValueEndpoint(w http.ResponseWriter, req *http.Request) {
@@ -174,3 +177,66 @@ func DeleteValueEndpoint(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s!\n", err), http.StatusGatewayTimeout)
 	}
 }
+
+//Функция регистрации
+func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
+	log.Println(req.Method, req.RequestURI)
+
+	_, err := config.Wp.AddTaskSyncTimed(func() interface{} {
+		var regUser model.User
+		_ = json.NewDecoder(req.Body).Decode(&regUser)
+
+		check := sqlite_connect.NewRecord(regUser)
+		if check == true {
+			sqlite_connect.Create(&regUser)
+			return nil
+		}
+		return nil
+	}, config.RequestWaitInQueueTimeout)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error: %s!\n", err), http.StatusGatewayTimeout)
+	}
+}
+
+
+//Функция авторизации
+func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
+	log.Println(req.Method, req.RequestURI)
+
+	_, err := config.Wp.AddTaskSyncTimed(func() interface{} {
+		var loginUser model.LoginUserService
+		_ = json.NewDecoder(req.Body).Decode(&loginUser)
+
+		sqlite_connect.Where("Login = ?", loginUser.Login)
+		//todo ORM check user in database
+
+		token := rand.Float64()
+		//todo check is token in database
+
+		json.NewEncoder(w).Encode(token)
+		return nil
+	}, config.RequestWaitInQueueTimeout)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error: %s!\n", err), http.StatusGatewayTimeout)
+	}
+}
+
+//Функция логаут
+func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
+	log.Println(req.Method, req.RequestURI)
+
+	_, err := config.Wp.AddTaskSyncTimed(func() interface{} {
+
+		httpHeader := req.Header
+		//todo check token in database and delete it
+
+		return nil
+	}, config.RequestWaitInQueueTimeout)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error: %s!\n", err), http.StatusGatewayTimeout)
+	}
+}
+

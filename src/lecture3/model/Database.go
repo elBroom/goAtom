@@ -8,7 +8,7 @@ type Database struct {
 	gorm.Model
 
 	Name             string
-	User 			 User 	`gorm:"ForeignKey:UserID"`
+	User 			 User 	`gorm:"ForeignKey:Login"`
 }
 
 func (Database) TableName() string {

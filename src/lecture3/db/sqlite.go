@@ -24,7 +24,7 @@ func Sqlite_connect() *gorm.DB {
 
 	sqlite_connect.LogMode(true)
 
-	sqlite_connect.AutoMigrate(&model.User{}, &model.Database{}, &model.Query{})
+	sqlite_connect.AutoMigrate(&model.User{}, &model.Database{}, &model.Query{}, &model.LoginUser{})
 
 	return sqlite_connect
 }
