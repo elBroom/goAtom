@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./config"
-	"./server"
-	"./db"
+	"app/config"
+	"app/server"
+	"app/db"
 	"log"
 	"strconv"
 )

@@ -6,11 +6,11 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"../model"
-	"../schema"
-	"../config"
-	"../workers"
-	"../db"
+	"app/model"
+	"app/schema"
+	"app/config"
+	"app/workers"
+	"app/db"
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 	"log"

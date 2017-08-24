@@ -1,7 +1,7 @@
 package db
 
 import (
-	"../config"
+	"app/config"
 	"github.com/go-redis/redis"
 	"strconv"
 )

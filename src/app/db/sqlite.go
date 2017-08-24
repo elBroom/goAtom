@@ -3,8 +3,8 @@ package db
 import (
 	"log"
 
-	"../config"
-	"../model"
+	"app/config"
+	"app/model"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/jinzhu/gorm"
 )

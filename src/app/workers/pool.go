@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 	"time"
-	"../config"
+	"app/config"
 )
 
 var (

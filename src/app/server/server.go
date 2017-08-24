@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 
-	"../router"
-	"../workers"
+	"app/router"
+	"app/workers"
 )
 
 func init() {
