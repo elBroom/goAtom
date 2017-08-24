@@ -1,11 +1,15 @@
 redis:
-  host: "localhost"
+  host: "elbroom.ru"
   port: 6379
   password: ""
   database: 0
 
 sqlite:
-  database_path: "./radish.db"
+  username: "go_atom_user"
+  password: "RvlAEHQFDNC1"
+  host: "elbroom.ru"
+  port: 5432
+  database: "go_atom"
 
 app:
   request_wait_in_queue_timeout: 100 # ms

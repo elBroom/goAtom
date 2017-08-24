@@ -21,16 +21,20 @@ type Redis struct {
 	Password string
 	Database int
 }
-var redis = Redis{Host:"localhost", Port:6379, Database:0}
+var redis = Redis{Host:"elbroom.ru", Port:6379, Database:0}
 func GetRedis() Redis {
 	return redis
 }
 
-type Sqlite struct {
-	DatabasePath string `yaml:"database_path"`
+type Sql struct {
+	Username string
+	Password string
+	Host     string
+	Port     int
+	Database string
 }
-var sqlite = Sqlite{DatabasePath:"./radish.db"}
-func GetSqlite() Sqlite {
+var sqlite = Sql{Username:"go_atom_user", Password:"RvlAEHQFDNC1", Host:"elbroom.ru", Port:5432, Database:"go_atom"}
+func GetSql() Sql {
 	return sqlite
 }
 
