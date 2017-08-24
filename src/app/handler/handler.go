@@ -6,15 +6,16 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"app/model"
-	"app/schema"
-	"app/config"
-	"app/workers"
-	"app/db"
+	"../model"
+	"../schema"
+	"../config"
+	"../workers"
+	"../db"
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 	"log"
 	"math/rand"
+	"strconv"
 )
 
 var redis_connect = db.Redis_init()
@@ -45,6 +46,16 @@ func getUser(login string) (*model.User, bool) {
 	var user model.User
 	ok := sqlite_connect.Where("Login = ?", login).First(&user).RecordNotFound()
 	return &user, ok
+}
+
+func checkToken(req *http.Request) (bool){
+	var token model.Token
+	tokenValue, err := strconv.ParseFloat(req.Header.Get("Bearer "), 64)
+	if err != nil {
+		return false
+	}
+	result := sqlite_connect.Where("Token = ?", tokenValue).Find(&token).RecordNotFound()
+	return !result
 }
 
 // Создать значение
@@ -223,14 +234,36 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 		var loginUser schema.User
 		_ = json.NewDecoder(req.Body).Decode(&loginUser)
 
-		sqlite_connect.Where("Login = ?", loginUser.Login)
-		//TODO: ORM check user in database
+		var user model.User
+		sqlite_connect.Where("Login = ?", loginUser.Login).Find(&user)
+		if &user == nil {
+			http.Error(w, "User doesn't exist", http.StatusBadRequest)
+			return nil
+		}
 
-		token := rand.Float64()
-		//TODO: check is token in database
+		var token model.Token
+		sqlite_connect.Where("UserId = ?", user.ID).Find(&token)
 
-		//TODO: save login to UserLog
-		json.NewEncoder(w).Encode(token)
+		if &token == nil {
+			tokenValue := rand.Float64()
+
+			for true {
+				sqlite_connect.Where("Token = ?", tokenValue).Find(&token)
+				if &token == nil {
+					break
+				}
+			}
+
+			sqlite_connect.Create(model.Token{
+				UserID: user.ID,
+				User: user,
+				Token: tokenValue,
+			})
+			w.Header().Set("Bearer ", strconv.FormatFloat(tokenValue, 'f', 6, 64))
+		} else {
+			w.Header().Set("Bearer ", strconv.FormatFloat(token.Token, 'f', 6, 64))
+		}
+
 		return nil
 	}, config.RequestWaitInQueueTimeout)
 
@@ -243,8 +276,24 @@ func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
 
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
 
-		//httpHeader := req.Header
-		//todo check token in database and delete it
+		tokenValue, err := strconv.ParseFloat(req.Header.Get("Bearer "), 64)
+		if err != nil {
+			http.Error(w, "Fucking request", http.StatusBadRequest)
+			return nil
+		}
+		if &tokenValue == nil {
+			http.Error(w, "You didn't login", http.StatusBadRequest)
+			return nil
+		} else {
+			var token model.Token
+			sqlite_connect.Where("Token = ?", tokenValue).Find(&token)
+			if &token == nil {
+				http.Error(w, "Bad token", http.StatusBadRequest)
+				return nil
+			} else {
+				sqlite_connect.Delete(&token)
+			}
+		}
 
 		return nil
 	}, config.RequestWaitInQueueTimeout)

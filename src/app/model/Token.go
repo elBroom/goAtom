@@ -8,7 +8,7 @@ type Token struct {
 	gorm.Model
 
 	Token         	 float64	`sql:"not null`
-	UserID			 int		`sql:"not null`
+	UserID			 uint		`sql:"not null`
 	User             User 		`gorm:"ForeignKey:UserID"`
 }
 
