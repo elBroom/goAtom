@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "TdtqgPoO6CTUOz8OwDaX0EtVP0M=",
+			"path": "github.com/elBroom/goAtom",
+			"revision": "8957a2d3a1195d83124ad41c09c8102dca834384",
+			"revisionTime": "2017-08-24T00:38:42Z"
+		},
+		{
 			"checksumSHA1": "YL/oT/qZ4rc2JM182hmzRBSIL+8=",
 			"path": "github.com/go-redis/redis",
 			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
@@ -37,6 +43,24 @@
 			"path": "github.com/go-redis/redis/internal/proto",
 			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
 			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",
+			"path": "github.com/golang/glog",
+			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
+			"revisionTime": "2016-01-25T20:49:56Z"
+		},
+		{
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
+		},
+		{
+			"checksumSHA1": "hIbmXmNbwyP44fi1hh6zJrMcYws=",
+			"path": "github.com/gorilla/mux",
+			"revision": "ac112f7d75a0714af1bd86ab17749b31f7809640",
+			"revisionTime": "2017-07-03T15:07:09Z"
 		},
 		{
 			"checksumSHA1": "BamUjeoJiinINyEjpv1AzKaTue4=",
