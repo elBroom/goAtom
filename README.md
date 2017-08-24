@@ -6,22 +6,15 @@
 GET
 получить значение
 получить историю запросов
----
-получить значение по префиксу
-получить значение по маски
-
 
 DELETE
 удалить значение
----
-удалить значение по префиксу
-удалить значение по маски
-удалить все
 
 POST
-создать пользователя
-создать базу
 создать значение
+регистрация
+логин
+логаут
 
 PUT
 изменить значение
@@ -29,51 +22,65 @@ PUT
 ```
 Концепт:
   * CRUD доступа к базе редис
-  * Журналирование на уровне rest запросов
-  * Конфиги к редису храняться в файле (хост, порт)
-  * Ассинхронное получение данных из редиса
+  * Журналирование запросов
+  * Конфиги храняться в файле
+  * Пулл воркеров
 
 Сущности:
-  * Пользователь в редисе (логин, пароль)
-  * База в редис (пользователь, схема)
-  * Журнал запросов (пользователь, время, ,база, запрос)
+  * Пользователь
+  * Журнал входа
+  * Журнал запросов
 
 
   
  Архитектура
  * RESTFull
- * Database redis
+ * Database redis, sqlite
  
 ```
 DataStructure:
 
-users: {
-    user: {
-        login: string,
-        password: string,
-        dbs: {string, ...},
-        queries: {
-            time: int,
-            db: string,
-            query: string
-        }
-    },
+user
+    id
     ...
-}
-
+    login
+    password
+    name
+    
+token
+    id
+    ...
+    token
+    user_id
+        
+user_log
+    id
+    created_at
+    ...
+    user_id
+    
+query_log
+    id
+    created_at
+    ...
+    query
+    user_id
 ```
 
 **Tasks:**
-  1. Прикрутить RESTFull (HTTP query)
-  1. Интегрировать редис
-  1. Создать сущности для редиса
-  1. Реализовать создание пользователя и базы
-  1. Реализовать методы CRUD(create, read, update, delete) для значений по ключу
-  1. Реализовать журналирование (сохранение запросов)
-  1. Реализовать получение данных из журнала
+  1. ~~Пулл воркеров~~
+  1. ~~Прикрутить RESTFull (HTTP query)~~
+  1. ~~Интегрировать redis~~
+  1. ~~Интегрировать sqlite~~
+  1. Получение конфигов из yaml
+  1. ~~Реализовать регистрацию~~
+  1. Реализовать логин, логаут
+  1. ~~Реализовать методы CRUD(create, read, update, delete) для значений по ключу~~
+  1. ~~Реализовать журналирование (сохранение запросов)~~
+  1. ~~Реализовать получение данных из журнала~~
   
  ```
- Создать
+ Создать значение
  curl -X POST \
    http://localhost:8080/value/ \
    -H 'content-type: application/json' \
@@ -82,7 +89,7 @@ users: {
  	"value": "123"
  }'
  
- Изменить
+ Изменить значение
  curl -X PUT \
    http://localhost:8080/value/test \
    -H 'content-type: application/json' \
@@ -91,7 +98,7 @@ users: {
  	"value": "456"
  }'
  
-Получить
+Получить значение
 curl -X GET \
   http://localhost:8080/value/test \
   -H 'content-type: application/json' \
@@ -100,9 +107,18 @@ curl -X GET \
 	value: 123
 }'
 
-Удалить
+Удалить значение
 curl -X DELETE \
   http://localhost:8080/value/test \
   -H 'content-type: application/json'
-
+  
+Регистрация
+ curl -X POST \
+   http://localhost:8080/user/ \
+   -H 'content-type: application/json' \
+   -d '{
+ 	"login": "test",
+ 	"password": "123",
+ 	"name": "Name Test"
+ }'
 ```

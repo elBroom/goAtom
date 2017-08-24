@@ -1,0 +1,73 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "YL/oT/qZ4rc2JM182hmzRBSIL+8=",
+			"path": "github.com/go-redis/redis",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "x/1eSGi0dmQIUdAzjKlPVPr1ndw=",
+			"path": "github.com/go-redis/redis/internal",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "GQZsUVg/+6UpQAYpc4luMvMutSI=",
+			"path": "github.com/go-redis/redis/internal/consistenthash",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "VP0K8vvf716n6xuzAZTvpz+wTwc=",
+			"path": "github.com/go-redis/redis/internal/hashtag",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "GorDWvfUq/08t1GG6rfvs5LKDqk=",
+			"path": "github.com/go-redis/redis/internal/pool",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "Ct2AS6Z9YmTAlKOMsBrhwvpXAPY=",
+			"path": "github.com/go-redis/redis/internal/proto",
+			"revision": "0daeac9c3e31a1b121318398249699f48bb8d2a4",
+			"revisionTime": "2017-08-21T07:19:13Z"
+		},
+		{
+			"checksumSHA1": "BamUjeoJiinINyEjpv1AzKaTue4=",
+			"path": "github.com/jinzhu/gorm",
+			"revision": "c3bb6aaa828867eec72dd8571d111e442688f85f",
+			"revisionTime": "2017-08-11T15:24:00Z"
+		},
+		{
+			"checksumSHA1": "4VZ1gLZHMumRjV3fclS1aX8S1aQ=",
+			"path": "github.com/jinzhu/gorm/dialects/sqlite",
+			"revision": "c3bb6aaa828867eec72dd8571d111e442688f85f",
+			"revisionTime": "2017-08-11T15:24:00Z"
+		},
+		{
+			"checksumSHA1": "VIp1lZm6joWhlNdwhady8u//qRw=",
+			"path": "github.com/jinzhu/inflection",
+			"revision": "1c35d901db3da928c72a72d8458480cc9ade058f",
+			"revisionTime": "2017-01-02T12:52:26Z"
+		},
+		{
+			"checksumSHA1": "GhdV8htXH9K6kWUuNZH/lc/z6rM=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "144deb6596cd6dbb49158b3d6f6a0e742715f9a5",
+			"revisionTime": "2017-08-22T04:32:16Z"
+		},
+		{
+			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
+			"path": "golang.org/x/net/context",
+			"revision": "1c05540f6879653db88113bc4a2b70aec4bd491f",
+			"revisionTime": "2017-08-04T00:04:37Z"
+		}
+	],
+	"rootPath": "/home/zarina/GoglandProjects/goAtom/src"
+}

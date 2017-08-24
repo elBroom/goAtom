@@ -1,0 +1,13 @@
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  database: 0
+
+sqlite:
+  database_path: "./radish.db"
+
+app:
+  request_wait_in_queue_timeout: 100 # ms
+  workers: 20
+  port: 8080
