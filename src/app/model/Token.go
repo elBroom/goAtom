@@ -2,12 +2,13 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/satori/go.uuid"
 )
 
 type Token struct {
 	gorm.Model
 
-	Token         	 float64	`sql:"not null`
+	Token         	 uuid.UUID	`sql:"not null`
 	UserID			 uint		`sql:"not null`
 	User             User 		`gorm:"ForeignKey:UserID"`
 }

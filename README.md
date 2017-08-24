@@ -28,6 +28,7 @@ PUT
 
 Сущности:
   * Пользователь
+  * Токены
   * Журнал входа
   * Журнал запросов
 
@@ -74,51 +75,73 @@ query_log
   1. ~~Интегрировать sqlite~~
   1. Получение конфигов из yaml
   1. ~~Реализовать регистрацию~~
-  1. Реализовать логин, логаут
+  1. ~~Реализовать логин, логаут~~
   1. ~~Реализовать методы CRUD(create, read, update, delete) для значений по ключу~~
   1. ~~Реализовать журналирование (сохранение запросов)~~
   1. ~~Реализовать получение данных из журнала~~
+  1. Хранение пароля
+  1. ~~Журналирование входа~~
   
  ```
+ Регистрация
+ curl -X POST \
+   http://localhost:8080/user \
+   -H 'content-type: application/json' \
+   -d '{
+ 	"login": "test2",
+ 	"password": "test",
+ 	"name": "power"
+ }'
+ 
+ Логин
+ curl -X POST \
+   http://localhost:8080/login \
+   -H 'content-type: application/json' \
+   -d '{
+ 	"login": "test2",
+ 	"password": "test"
+ }'
+ 
  Создать значение
  curl -X POST \
    http://localhost:8080/value/ \
+   -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01' \
    -H 'content-type: application/json' \
    -d '{
- 	"key": "test",
- 	"value": "123"
+	"key": "test",
+	"value": "123",
+	"expiration":20
  }'
  
  Изменить значение
  curl -X PUT \
    http://localhost:8080/value/test \
+   -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01' \
    -H 'content-type: application/json' \
    -d '{
  	"key": "test",
- 	"value": "456"
+ 	"value": "456"б
+ 	"expiration":20
  }'
  
 Получить значение
-curl -X GET \
-  http://localhost:8080/value/test \
-  -H 'content-type: application/json' \
-  -d '{
-	key: test,
-	value: 123
-}'
+ curl -X GET \
+   http://localhost:8080/value/test \
+   -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
 
 Удалить значение
 curl -X DELETE \
   http://localhost:8080/value/test \
-  -H 'content-type: application/json'
+  -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
   
-Регистрация
- curl -X POST \
-   http://localhost:8080/user/ \
-   -H 'content-type: application/json' \
-   -d '{
- 	"login": "test",
- 	"password": "123",
- 	"name": "Name Test"
- }'
+Получить историю запросо
+ curl -X GET \
+   http://localhost:8080/history \
+   -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
+   
+Логаут
+curl -X POST \
+  http://localhost:8080/logout \
+  -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
+
 ```
