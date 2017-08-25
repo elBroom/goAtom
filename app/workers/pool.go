@@ -4,7 +4,8 @@ import (
 	"errors"
 	"sync"
 	"time"
-	"app/config"
+
+	"github.com/elBroom/goAtom/app/config"
 )
 
 var (

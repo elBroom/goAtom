@@ -1,11 +1,12 @@
 package main
 
 import (
-	"app/config"
-	"app/server"
-	"app/db"
 	"log"
 	"strconv"
+
+	"github.com/elBroom/goAtom/app/config"
+	"github.com/elBroom/goAtom/app/db"
+	"github.com/elBroom/goAtom/app/server"
 )
 
 func main() {

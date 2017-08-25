@@ -14,4 +14,4 @@ sqlite:
 app:
   request_wait_in_queue_timeout: 100 # ms
   workers: 20
-  port: 8080
+  port: 3030

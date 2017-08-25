@@ -4,22 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"app/model"
-	"app/schema"
-	"app/config"
-	"app/workers"
-	"app/db"
-	//"../model"
-	//"../schema"
-	//"../config"
-	//"../workers"
-	//"../db"
-	"github.com/go-redis/redis"
-	"github.com/golang/glog"
-	"github.com/satori/go.uuid"
-	"github.com/gorilla/mux"
 	"log"
 	"time"
+
+	"github.com/elBroom/goAtom/app/config"
+	"github.com/elBroom/goAtom/app/db"
+	"github.com/elBroom/goAtom/app/model"
+	"github.com/elBroom/goAtom/app/schema"
+	"github.com/elBroom/goAtom/app/workers"
+	"github.com/go-redis/redis"
+	"github.com/golang/glog"
+	"github.com/gorilla/mux"
+	"github.com/satori/go.uuid"
 )
 
 var redis_connect = db.Redis_init()
@@ -31,7 +27,7 @@ func raiseServerError(w http.ResponseWriter, err error) interface{} {
 	return nil
 }
 
-func checkTimeout(w http.ResponseWriter, err error)  {
+func checkTimeout(w http.ResponseWriter, err error) {
 	if err != nil {
 		// Отваливаемся по Timeout
 		glog.Errorln("Timeout")
@@ -39,12 +35,12 @@ func checkTimeout(w http.ResponseWriter, err error)  {
 	}
 }
 
-func saveQuery(query string, params interface{}, tokenValue uuid.UUID)  {
+func saveQuery(query string, params interface{}, tokenValue uuid.UUID) {
 	paramsB, _ := json.Marshal(params)
 	var token model.Token
 	sql_connect.Where("Token = ?", tokenValue).First(&token)
 
-	sql_connect.Create(&model.QueryLog{ Query: query, Params: string(paramsB), UserID: token.UserID })
+	sql_connect.Create(&model.QueryLog{Query: query, Params: string(paramsB), UserID: token.UserID})
 }
 
 func getUser(login string) (*model.User, bool) {
@@ -53,11 +49,11 @@ func getUser(login string) (*model.User, bool) {
 	return &user, ok
 }
 
-func getTokenValue(req *http.Request) (uuid.UUID, error)  {
+func getTokenValue(req *http.Request) (uuid.UUID, error) {
 	return uuid.FromString(req.Header.Get("Authorization"))
 }
 
-func checkToken(req *http.Request) (bool){
+func checkToken(req *http.Request) bool {
 	var token model.Token
 	tokenValue, err := getTokenValue(req)
 	if err != nil {
@@ -261,7 +257,6 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 	checkTimeout(w, err)
 }
 
-
 //Функция авторизации
 func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 	log.Println(req.Method, req.RequestURI)
@@ -292,12 +287,12 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 				tokenValue = uuid.NewV4()
 			}
 
-			err := sql_connect.Create(&model.Token{ UserID: user.ID, Token: tokenValue }).Error
+			err := sql_connect.Create(&model.Token{UserID: user.ID, Token: tokenValue}).Error
 			if err != nil {
 				return raiseServerError(w, err)
 			}
 			// Регистрируем вход
-			sql_connect.Create(&model.UserLog{ UserID: user.ID })
+			sql_connect.Create(&model.UserLog{UserID: user.ID})
 
 			w.Header().Set("Authorization ", tokenValue.String())
 		} else {
@@ -352,9 +347,8 @@ func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-
 // Получение истории
-func GetHistoryEndpoint(w http.ResponseWriter, req *http.Request)  {
+func GetHistoryEndpoint(w http.ResponseWriter, req *http.Request) {
 	glog.Infoln(req.Method, req.RequestURI)
 	// Проверяем авторизацию
 	if !checkToken(req) {

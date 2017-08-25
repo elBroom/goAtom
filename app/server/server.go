@@ -2,10 +2,11 @@ package server
 
 import (
 	"net/http"
+
 	"github.com/gorilla/mux"
 
-	"app/router"
-	"app/workers"
+	"github.com/elBroom/goAtom/app/router"
+	"github.com/elBroom/goAtom/app/workers"
 )
 
 func init() {

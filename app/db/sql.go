@@ -3,11 +3,12 @@ package db
 import (
 	"log"
 
-	"app/config"
-	"app/model"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/jinzhu/gorm"
 	"fmt"
+
+	"github.com/elBroom/goAtom/app/config"
+	"github.com/elBroom/goAtom/app/model"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var sql_connect (*gorm.DB) = nil

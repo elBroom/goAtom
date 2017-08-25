@@ -1,12 +1,13 @@
 package db
 
 import (
-	"app/config"
-	"github.com/go-redis/redis"
 	"strconv"
+
+	"github.com/elBroom/goAtom/app/config"
+	"github.com/go-redis/redis"
 )
 
-var redis_connect  (*redis.Client)  = nil
+var redis_connect (*redis.Client) = nil
 
 func Redis_init() *redis.Client {
 	if redis_connect != nil {
