@@ -1,8 +1,30 @@
 package config
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
 	"time"
+
+	"log"
+
+	yaml "gopkg.in/yaml.v2"
 )
+
+func GetYamlConfig(name string, config interface{}) error {
+	dir := os.Getenv("GOPATH") + "/src/github.com/elBroom/goAtom/config"
+	configPath := fmt.Sprintf("%s/%s.yml", dir, name)
+	configContent, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return fmt.Errorf("can't read config %q: %s", configPath, err)
+	}
+
+	if err = yaml.Unmarshal(configContent, config); err != nil {
+		return fmt.Errorf("invalid yaml in config %q: %s", configPath, err)
+	}
+
+	return nil
+}
 
 type App struct {
 	RequestWaitInQueueTimeout time.Duration `yaml:"request_wait_in_queue_timeout"`
@@ -10,8 +32,8 @@ type App struct {
 	Port                      int
 }
 
-var app = App{RequestWaitInQueueTimeout: 100, Workers: 20, Port: 3030}
-var RequestWaitInQueueTimeout = time.Millisecond * app.RequestWaitInQueueTimeout
+var app App
+var RequestWaitInQueueTimeout time.Duration
 
 func GetApp() App {
 	return app
@@ -24,7 +46,7 @@ type Redis struct {
 	Database int
 }
 
-var redis = Redis{Host: "elbroom.ru", Port: 6379, Database: 0}
+var redis Redis
 
 func GetRedis() Redis {
 	return redis
@@ -38,10 +60,22 @@ type Sql struct {
 	Database string
 }
 
-var sqlite = Sql{Username: "go_atom_user", Password: "RvlAEHQFDNC1", Host: "elbroom.ru", Port: 5432, Database: "go_atom"}
+var sql Sql
 
 func GetSql() Sql {
-	return sqlite
+	return sql
 }
 
-// TODO: parse yaml file
+func init() {
+	if err := GetYamlConfig("app", &app); err != nil {
+		log.Fatalf("can't read app config: %s", err)
+	}
+	RequestWaitInQueueTimeout = time.Millisecond * app.RequestWaitInQueueTimeout
+
+	if err := GetYamlConfig("sql", &sql); err != nil {
+		log.Fatalf("can't read sql config: %s", err)
+	}
+	if err := GetYamlConfig("redis", &redis); err != nil {
+		log.Fatalf("can't read redis config: %s", err)
+	}
+}

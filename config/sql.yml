@@ -1,0 +1,5 @@
+username: "go_atom_user"
+password: "RvlAEHQFDNC1"
+host: "elbroom.ru"
+port: 5432
+database: "go_atom"

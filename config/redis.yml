@@ -1,0 +1,4 @@
+host: "elbroom.ru"
+port: 6379
+password: ""
+database: 0
