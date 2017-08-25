@@ -4,16 +4,21 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
-	"../model"
-	"../schema"
-	"../config"
-	"../workers"
-	"../db"
+	"app/model"
+	"app/schema"
+	"app/config"
+	"app/workers"
+	"app/db"
+	//"../model"
+	//"../schema"
+	//"../config"
+	//"../workers"
+	//"../db"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
+	"github.com/satori/go.uuid"
+	"github.com/gorilla/mux"
 	"log"
 	"math/rand"
 	"strconv"
@@ -41,32 +46,42 @@ func checkTimeout(w http.ResponseWriter, err error)  {
 	}
 }
 
-func saveQuery(query string, params interface{})  {
+func saveQuery(query string, params interface{}, tokenValue uuid.UUID)  {
 	paramsB, _ := json.Marshal(params)
-	// TODO get user_id
-	row := model.QueryLog{ Query: query, Params: string(paramsB), UserID: 1	}
-	sqlite_connect.Create(&row)
+	var token model.Token
+	sql_connect.Where("Token = ?", tokenValue).First(&token)
+
+	sql_connect.Create(&model.QueryLog{ Query: query, Params: string(paramsB), UserID: token.UserID })
 }
 
 func getUser(login string) (*model.User, bool) {
 	var user model.User
-	ok := sqlite_connect.Where("Login = ?", login).First(&user).RecordNotFound()
+	ok := !sql_connect.Where("Login = ?", login).First(&user).RecordNotFound()
 	return &user, ok
+}
+
+func getTokenValue(req *http.Request) (uuid.UUID, error)  {
+	return uuid.FromString(req.Header.Get("Authorization"))
 }
 
 func checkToken(req *http.Request) (bool){
 	var token model.Token
-	tokenValue, err := strconv.ParseFloat(req.Header.Get("Bearer "), 64)
+	tokenValue, err := getTokenValue(req)
 	if err != nil {
 		return false
 	}
-	result := sqlite_connect.Where("Token = ?", tokenValue).Find(&token).RecordNotFound()
+	result := sql_connect.Where("Token = ?", tokenValue).Find(&token).RecordNotFound()
 	return !result
 }
 
 // Создать значение
 func CreateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// Callback
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
@@ -87,13 +102,14 @@ func CreateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// Добавляем ключ
-		err = redis_connect.Set(data.Key, data.Value, data.Expiration).Err()
+		err = redis_connect.Set(data.Key, data.Value, data.Expiration*time.Second).Err()
 		if err != nil {
 			return raiseServerError(w, err)
 		}
 
 		// Сохраняем запрос
-		saveQuery("insert", data)
+		tokenValue, _ := getTokenValue(req)
+		saveQuery("insert", data, tokenValue)
 
 		// Возвращаем добавленые данные
 		json.NewEncoder(w).Encode(data)
@@ -106,6 +122,11 @@ func CreateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 // Изменяем значение
 func UpdateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	params := mux.Vars(req)
 
 	// Callback
@@ -127,13 +148,14 @@ func UpdateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 		defer req.Body.Close()
 
 		// Изменяем ключ
-		err = redis_connect.Set(data.Key, data.Value, data.Expiration).Err()
+		err = redis_connect.Set(data.Key, data.Value, data.Expiration*time.Second).Err()
 		if err != nil {
 			return raiseServerError(w, err)
 		}
 
 		// Сохраняем запрос
-		saveQuery("update", data)
+		tokenValue, _ := getTokenValue(req)
+		saveQuery("update", data, tokenValue)
 
 		//Возвращаем измененные данные
 		json.NewEncoder(w).Encode(data)
@@ -146,6 +168,11 @@ func UpdateValueEndpoint(w http.ResponseWriter, req *http.Request) {
 // Получаем значение
 func GetValueEndpoint(w http.ResponseWriter, req *http.Request) {
 	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	params := mux.Vars(req)
 
 	// Callback
@@ -165,7 +192,8 @@ func GetValueEndpoint(w http.ResponseWriter, req *http.Request) {
 		// Сохраняем запрос
 		var data schema.Data
 		data.Key = params["key"]
-		saveQuery("get", data)
+		tokenValue, _ := getTokenValue(req)
+		saveQuery("get", data, tokenValue)
 
 		json.NewEncoder(w).Encode(val)
 		return nil
@@ -177,6 +205,11 @@ func GetValueEndpoint(w http.ResponseWriter, req *http.Request) {
 // Удаляем значение
 func DeleteValueEndpoint(w http.ResponseWriter, req *http.Request) {
 	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	params := mux.Vars(req)
 
 	// Callback
@@ -202,7 +235,8 @@ func DeleteValueEndpoint(w http.ResponseWriter, req *http.Request) {
 		// Сохраняем запрос
 		var data schema.Data
 		data.Key = params["key"]
-		saveQuery("delete", data)
+		tokenValue, _ := getTokenValue(req)
+		saveQuery("delete", data, tokenValue)
 
 		return nil
 	}, config.RequestWaitInQueueTimeout)
@@ -219,7 +253,7 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 		_ = json.NewDecoder(req.Body).Decode(&regUser)
 
 		_, ok := getUser(regUser.Login)
-		if !ok {
+		if ok {
 			http.Error(w, "User exist", http.StatusBadRequest)
 			return nil
 		}
@@ -243,15 +277,16 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 		var loginUser schema.User
 		_ = json.NewDecoder(req.Body).Decode(&loginUser)
 
-		var user model.User
-		sqlite_connect.Where("Login = ?", loginUser.Login).Find(&user)
-		if &user == nil {
+		user, ok := getUser(loginUser.Login)
+		if !ok {
 			http.Error(w, "User doesn't exist", http.StatusBadRequest)
 			return nil
 		}
 
+		// TODO check Login and Password
+
 		var token model.Token
-		sqlite_connect.Where("UserId = ?", user.ID).Find(&token)
+		notFound := sql_connect.Where("user_id = ?", user.ID).Find(&token).RecordNotFound()
 
 		if &token == nil {
 			var existingUser model.User
@@ -273,22 +308,25 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 			tokenValue := rand.Float64()
 
 			for true {
-				sqlite_connect.Where("Token = ?", tokenValue).Find(&token)
-				if &token == nil {
+				notFound = sql_connect.Where("Token = ?", tokenValue).Find(&token).RecordNotFound()
+				if notFound {
 					break
 				}
 			}
 
-			sqlite_connect.Create(model.Token{
-				UserID: user.ID,
-				User: user,
-				Token: tokenValue,
-			})
-			w.Header().Set("Bearer ", strconv.FormatFloat(tokenValue, 'f', 6, 64))
+			err := sql_connect.Create(&model.Token{ UserID: user.ID, Token: tokenValue }).Error
+			if err != nil {
+				return raiseServerError(w, err)
+			}
+			// Регистрируем вход
+			sql_connect.Create(&model.UserLog{ UserID: user.ID })
+
+			w.Header().Set("Authorization ", tokenValue.String())
 		} else {
-			w.Header().Set("Bearer ", strconv.FormatFloat(token.Token, 'f', 6, 64))
+			w.Header().Set("Authorization ", token.Token.String())
 		}
 
+		w.Write([]byte("ok"))
 		return nil
 	}, config.RequestWaitInQueueTimeout)
 
@@ -297,29 +335,36 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 
 //Функция логаут
 func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
-	log.Println(req.Method, req.RequestURI)
+	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
 
-		tokenValue, err := strconv.ParseFloat(req.Header.Get("Bearer "), 64)
+		tokenValue, err := getTokenValue(req)
 		if err != nil {
-			http.Error(w, "Fucking request", http.StatusBadRequest)
-			return nil
+			return raiseServerError(w, err)
 		}
 		if &tokenValue == nil {
-			http.Error(w, "You didn't login", http.StatusBadRequest)
+			glog.Warningln("Didn't login")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return nil
-		} else {
-			var token model.Token
-			sqlite_connect.Where("Token = ?", tokenValue).Find(&token)
-			if &token == nil {
-				http.Error(w, "Bad token", http.StatusBadRequest)
-				return nil
-			} else {
-				sqlite_connect.Delete(&token)
-			}
 		}
 
+		var token model.Token
+		notFound := sql_connect.Where("Token = ?", tokenValue).Find(&token).RecordNotFound()
+		if notFound {
+			glog.Warningln("Bad token")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return nil
+		} else {
+			sql_connect.Delete(&token)
+		}
+
+		w.Write([]byte("ok"))
 		return nil
 	}, config.RequestWaitInQueueTimeout)
 
@@ -333,12 +378,17 @@ func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
 // Получение истории
 func GetHistoryEndpoint(w http.ResponseWriter, req *http.Request)  {
 	glog.Infoln(req.Method, req.RequestURI)
+	// Проверяем авторизацию
+	if !checkToken(req) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// Callback
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
 		var data [](*model.QueryLog)
 
-		err := sqlite_connect.Limit(10).Find(&data).Error
+		err := sql_connect.Limit(10).Find(&data).Error
 		if err != nil {
 			return raiseServerError(w, err)
 		}

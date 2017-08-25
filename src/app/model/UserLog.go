@@ -7,7 +7,7 @@ import (
 type UserLog struct {
 	gorm.Model
 
-	UserID			 int		`sql:"not null`
+	UserID			 uint		`sql:"not null`
 	User 			 User 		`gorm:"ForeignKey:UserID"`
 }
 

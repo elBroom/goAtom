@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	sqlite_connect := db.Sqlite_connect()
-	defer sqlite_connect.Close()
-	//
+	sql_connect := db.Sql_connect()
+	defer sql_connect.Close()
+
 	redis_connect := db.Redis_init()
 	defer redis_connect.Close()
 

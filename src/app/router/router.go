@@ -14,7 +14,7 @@ func Routing(router *mux.Router) {
 
 	router.HandleFunc("/user", handler.CreateUserEndpoint).Methods("POST")
 	router.HandleFunc("/login", handler.AuthUserQuery).Methods("POST")
-	router.HandleFunc("/login", handler.LogoutUserQuery).Methods("POST")
+	router.HandleFunc("/logout", handler.LogoutUserQuery).Methods("POST")
 
 	router.HandleFunc("/history", handler.GetHistoryEndpoint).Methods("GET")
 }

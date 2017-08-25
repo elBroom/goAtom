@@ -9,7 +9,7 @@ type QueryLog struct {
 
 	Query            string		`sql:"not null`
 	Params		     string
-	UserID			 int		`sql:"not null`
+	UserID			 uint		`sql:"not null`
 	User 			 User 		`gorm:"ForeignKey:UserID"`
 }
 
