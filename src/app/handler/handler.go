@@ -11,6 +11,7 @@ import (
 	"../config"
 	"../workers"
 	"../db"
+	"golang.org/x/crypto/bcrypt"
 	"github.com/go-redis/redis"
 	"github.com/golang/glog"
 	"log"
@@ -25,6 +26,11 @@ func raiseServerError(w http.ResponseWriter, err error) interface{} {
 	glog.Errorln(err)
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 	return nil
+}
+
+func getPasswordHash(pwd string) (result []byte, err error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	return hashedPassword, err
 }
 
 func checkTimeout(w http.ResponseWriter, err error)  {
@@ -218,6 +224,9 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
+		hash, _ := getPasswordHash(regUser.Password)
+		regUser.Password = string(hash[:])
+
 		sqlite_connect.Create(&regUser)
 		return nil
 	}, config.RequestWaitInQueueTimeout)
@@ -245,6 +254,22 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 		sqlite_connect.Where("UserId = ?", user.ID).Find(&token)
 
 		if &token == nil {
+			var existingUser model.User
+			sqlite_connect.Where("Login = ?", loginUser.Login).Find(&existingUser)
+
+			if &existingUser == nil {
+				http.Error(w, "User doesn't exist", http.StatusBadRequest)
+				return nil
+			}
+
+			loginUserPwd, _ := getPasswordHash(loginUser.Password)
+			pwdString := string(loginUserPwd[:])
+
+			if existingUser.Password != pwdString {
+				http.Error(w, "Bad login or password", http.StatusBadRequest)
+				return nil
+			}
+
 			tokenValue := rand.Float64()
 
 			for true {
