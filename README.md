@@ -3,6 +3,8 @@
 
 Ссылка на проект http://elbroom.ru:6060/
 
+Ссылка на презентацию https://gitpitch.com/elBroom/goAtom/master?grs=github&t=black&p=presentation
+
 
 Методы api:
 ```

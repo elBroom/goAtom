@@ -5,19 +5,21 @@
   * Сайфуллина Зарина (@elBroom)
   * Баранов Михаил (@kinetikm)
 
-[http://elbroom.ru:6060/login](http://elbroom.ru:6060/login)
+[http://elbroom.ru:6060](http://elbroom.ru:6060)
 
 #HSLIDE
 ### Реализовано
   * Работа с пользователем
   * CRUD доступа к базе редис
   * Журналирование запросов
+  * UI
 
 #HSLIDE
 ### Используемые технологии
 - Go 1.8
 - PostgreSQL
 - Redis
+- Docker
 
 #HSLIDE
 ### Сущности
@@ -54,6 +56,9 @@ PUT
 изменить значение
 
 ```
+
+#HSLIDE
+[http://elbroom.ru:6060/login](http://elbroom.ru:6060/login)
 
 #HSLIDE
 ### Спасибо за внимание
