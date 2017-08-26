@@ -40,6 +40,11 @@
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <script type="text/javascript">
+        var login_link = "/login";
+        var pref = "/api";
+
+//        var login_link = "/static/login.html";
+//        var pref = "";
         $(function() {
             checkToken();
 
@@ -47,7 +52,7 @@
                 clearError();
                 clearSuccess();
                 $.ajax({
-                    url: '/logout',
+                    url: pref+'/logout',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
@@ -61,7 +66,7 @@
                     error: function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.responseText == "ok") {
                             eraseCookie("token");
-                            window.location = "/static/login.html";
+                            window.location = login_link;
                         } else {
                             viewError(jqXHR.responseText);
                         }
@@ -85,7 +90,7 @@
                 }
 
                 $.ajax({
-                    url: '/value/',
+                    url: pref+'/value/',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
@@ -118,7 +123,7 @@
                 }
 
                 $.ajax({
-                    url: '/value/'+data.key,
+                    url: pref+'/value/'+data.key,
                     method: 'PUT',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
@@ -148,7 +153,7 @@
                 }
 
                 $.ajax({
-                    url: '/value/'+data.key,
+                    url: pref+'/value/'+data.key,
                     method: 'GET',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
@@ -178,7 +183,7 @@
 
                 key = data.key
                 $.ajax({
-                    url: '/value/'+data.key,
+                    url: pref+'/value/'+data.key,
                     method: 'DELETE',
                     contentType: "application/json; charset=utf-8",
                     beforeSend: function setAuthHeader(xhr){
@@ -197,7 +202,7 @@
 
         function getHistory() {
             $.ajax({
-                url: '/history',
+                url: pref+'/history',
                 method: 'GET',
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
@@ -219,7 +224,7 @@
 
         function checkToken(){
             if (!readCookie("token")) {
-                window.location = "/static/login.html";
+                window.location = login_link;
             }
         }
 

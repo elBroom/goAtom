@@ -178,6 +178,12 @@
         </div>
     </div>
     <script type="text/javascript">
+        var index_link = "/";
+        var pref = "/api";
+
+//        var index_link = "/static/index.html";
+//        var pref = "";
+
         $(function() {
             $('#login-form-link').click(function(e) {
                 $("#login-form").delay(100).fadeIn(100);
@@ -211,7 +217,7 @@
                 }
 
                 $.ajax({
-                    url: '/login',
+                    url: pref+'/login',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
@@ -222,7 +228,7 @@
                     error: function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.responseText == "ok") {
                             createCookie("token", jqXHR.getResponseHeader('Authorization'), 1);
-                            window.location = "/static/index.html";
+                            window.location = index_link;
                         } else {
                             viewError("login", jqXHR.responseText);
                         }
@@ -252,7 +258,7 @@
                 }
 
                 $.ajax({
-                    url: '/user',
+                    url: pref+'/user',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
