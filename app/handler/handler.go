@@ -16,6 +16,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var redis_connect = db.Redis_init()
@@ -25,6 +26,11 @@ func raiseServerError(w http.ResponseWriter, err error) interface{} {
 	glog.Errorln(err)
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 	return nil
+}
+
+func getPasswordHash(pwd string) (result []byte, err error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	return hashedPassword, err
 }
 
 func checkTimeout(w http.ResponseWriter, err error) {
@@ -247,7 +253,8 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
-		// TODO add hash and salt for password
+		hash, _ := getPasswordHash(regUser.Password)
+		regUser.Password = string(hash[:])
 
 		sql_connect.Create(&regUser)
 		w.WriteHeader(http.StatusOK)
@@ -272,12 +279,18 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
-		// TODO check Login and Password
-
 		var token model.Token
 		notFound := sql_connect.Where("user_id = ?", user.ID).Find(&token).RecordNotFound()
 
 		if notFound {
+			loginUserPwd, _ := getPasswordHash(loginUser.Password)
+			pwdString := string(loginUserPwd[:])
+
+			if user.Password != pwdString {
+				http.Error(w, "Bad login or password", http.StatusBadRequest)
+				return nil
+			}
+
 			tokenValue := uuid.NewV4()
 
 			for true {
