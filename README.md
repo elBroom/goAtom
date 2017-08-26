@@ -39,7 +39,7 @@ PUT
   
  Архитектура
  * RESTFull
- * Database redis, sqlite
+ * Database redis, postgres
  
 ```
 DataStructure:
