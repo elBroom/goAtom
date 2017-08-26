@@ -369,7 +369,7 @@ func GetHistoryEndpoint(w http.ResponseWriter, req *http.Request) {
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
 		var data [](*model.QueryLog)
 
-		err := sql_connect.Limit(10).Preload("User").Find(&data).Error
+		err := sql_connect.Limit(10).Preload("User").Order("created_at DESC").Find(&data).Error
 		if err != nil {
 			return raiseServerError(w, err)
 		}
