@@ -250,6 +250,7 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 		// TODO add hash and salt for password
 
 		sql_connect.Create(&regUser)
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 		return nil
 	}, config.RequestWaitInQueueTimeout)
@@ -299,6 +300,7 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Authorization ", token.Token.String())
 		}
 
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 		return nil
 	}, config.RequestWaitInQueueTimeout)
@@ -337,6 +339,7 @@ func LogoutUserQuery(w http.ResponseWriter, req *http.Request) {
 			sql_connect.Delete(&token)
 		}
 
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 		return nil
 	}, config.RequestWaitInQueueTimeout)
@@ -360,7 +363,7 @@ func GetHistoryEndpoint(w http.ResponseWriter, req *http.Request) {
 	_, err := workers.Wp.AddTaskSyncTimed(func() interface{} {
 		var data [](*model.QueryLog)
 
-		err := sql_connect.Limit(10).Find(&data).Error
+		err := sql_connect.Limit(10).Preload("User").Find(&data).Error
 		if err != nil {
 			return raiseServerError(w, err)
 		}
