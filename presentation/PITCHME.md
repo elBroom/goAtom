@@ -16,10 +16,16 @@
 
 #HSLIDE
 ### Используемые технологии
+**Backend**
+- Nginx
+- Docker
 - Go 1.8
 - PostgreSQL
 - Redis
-- Docker
+
+**UI**
+- Bootstrap
+- jQuery
 
 #HSLIDE
 ### Сущности
