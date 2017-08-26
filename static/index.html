@@ -7,17 +7,28 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <title>HTTP интерфейс для редиски</title>
         <style type="text/css">
-        form {
-            padding: 20px 40px;
-            width: 400px;
+        #logout {
+            width: 100%;
+            clear: both;
         }
+        #data-form {
+            padding: 20px 40px;
+            width: 40%;
+            float: left;
+        }
+        #history {
+            padding: 20px 10px;
+            width: 60%;
+            float: right;
+        }
+
     </style>
 </head>
 <body>
 <button type="button" class="btn btn-info" id="logout">Logout</button>
-<div id="form-error" class="alert alert-danger" style="display: none;"></div>
-<div id="form-success" class="alert alert-success" style="display: none;"></div>
     <form id="data-form">
+        <div id="form-error" class="alert alert-danger" style="display: none;"></div>
+        <div id="form-success" class="alert alert-success" style="display: none;"></div>
        <div class="form-group">
         <label for="inputdefault">Key</label>
         <input class="form-control input-normal" id="key" name="key" type="text">
@@ -35,6 +46,19 @@
       <button type="button" class="btn btn-success" id="get_data">Get</button>
       <button type="button" class="btn btn-danger" id="delete_data">Delete</button>
     </form>
+    <div id="history">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Time</th>
+                <th>Query</th>
+                <th>Params</th>
+            </tr>
+            </thead>
+            <tbody id="history_content"></tbody>
+        </table>
+    </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -45,8 +69,11 @@
 
 //        var login_link = "/static/login.html";
 //        var pref = "";
+
         $(function() {
             checkToken();
+            getHistory();
+            setInterval(getHistory, 10000);
 
             $('#logout').click(function(e) {
                 clearError();
@@ -210,10 +237,20 @@
                     xhr.setRequestHeader('Authorization', readCookie("token"));
                 },
                 success: function(data, textStatus, jqXHR) {
-                    debugger;
+                    var content = '';
+                    $.each(data, function( index, value ) {
+                        var date = new Date(Date.parse(value.CreatedAt)).toUTCString();
+                        content += '<tr>';
+                        content += '<td>'+value.User.Login+'</td>';
+                        content += '<td>'+date+'</td>';
+                        content += '<td>'+value.Query+'</td>';
+                        content += '<td>'+value.Params+'</td>';
+                        content += '</tr>';
+                    });
+                    $('#history_content').html(content);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    viewError(jqXHR.responseText);
+                    console.log(jqXHR.responseText);
                 }
             });
         }
