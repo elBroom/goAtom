@@ -3,7 +3,9 @@
 
 Авторы:
   * Сайфуллина Зарина (@elBroom)
-  * Баранов Михаил (@kinetik)
+  * Баранов Михаил (@kinetikm)
+
+[http://elbroom.ru:6060/login](http://elbroom.ru:6060/login)
 
 #HSLIDE
 ### Реализовано
