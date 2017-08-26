@@ -28,11 +28,6 @@ func raiseServerError(w http.ResponseWriter, err error) interface{} {
 	return nil
 }
 
-func getPasswordHash(pwd string) (result []byte, err error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	return hashedPassword, err
-}
-
 func checkTimeout(w http.ResponseWriter, err error) {
 	if err != nil {
 		// Отваливаемся по Timeout
@@ -253,8 +248,8 @@ func CreateUserEndpoint(w http.ResponseWriter, req *http.Request) {
 			return nil
 		}
 
-		hash, _ := getPasswordHash(regUser.Password)
-		regUser.Password = string(hash[:])
+		hash, _ := bcrypt.GenerateFromPassword([]byte(regUser.Password), bcrypt.DefaultCost)
+		regUser.Password = string(hash)
 
 		sql_connect.Create(&regUser)
 		w.WriteHeader(http.StatusOK)
@@ -283,10 +278,8 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 		notFound := sql_connect.Where("user_id = ?", user.ID).Find(&token).RecordNotFound()
 
 		if notFound {
-			loginUserPwd, _ := getPasswordHash(loginUser.Password)
-			pwdString := string(loginUserPwd[:])
-
-			if user.Password != pwdString {
+			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginUser.Password))
+			if err != nil {
 				http.Error(w, "Bad login or password", http.StatusBadRequest)
 				return nil
 			}
@@ -301,7 +294,7 @@ func AuthUserQuery(w http.ResponseWriter, req *http.Request) {
 				tokenValue = uuid.NewV4()
 			}
 
-			err := sql_connect.Create(&model.Token{UserID: user.ID, Token: tokenValue}).Error
+			err = sql_connect.Create(&model.Token{UserID: user.ID, Token: tokenValue}).Error
 			if err != nil {
 				return raiseServerError(w, err)
 			}
