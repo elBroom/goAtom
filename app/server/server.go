@@ -16,6 +16,8 @@ func init() {
 func RunHTTPServer(addr string) error {
 	_router := mux.NewRouter()
 
+	_router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+
 	router.Routing(_router)
 	return http.ListenAndServe(addr, _router)
 }

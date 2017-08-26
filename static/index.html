@@ -6,13 +6,257 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <title>HTTP интерфейс для редиски</title>
+        <style type="text/css">
+        form {
+            padding: 20px 40px;
+            width: 400px;
+        }
+    </style>
 </head>
 <body>
+<button type="button" class="btn btn-info" id="logout">Logout</button>
+<div id="form-error" class="alert alert-danger" style="display: none;"></div>
+<div id="form-success" class="alert alert-success" style="display: none;"></div>
+    <form>
 
+       <div class="form-group">
+        <label for="inputdefault">Key</label>
+        <input class="form-control input-normal" id="key" type="text">
+      </div>
+      <div class="form-group">
+        <label for="inputdefault">Value</label>
+        <input class="form-control input-normal" id="value" type="text">
+      </div>
+      <div class="form-group">
+        <label for="inputdefault">Expiration</label>
+        <input class="form-control input-normal" id="expiration" type="text" pattern="/d+">
+      </div>
+      <button type="button" class="btn btn-primary" id="insert_data">Insert</button>
+      <button type="button" class="btn btn-warning" id="update_data">Update</button>
+      <button type="button" class="btn btn-success" id="get_data">Get</button>
+      <button type="button" class="btn btn-danger" id="delete_data">Delete</button>
+    </form>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            checkToken();
+
+            $('#logout').click(function(e) {
+                clearError();
+                $.ajax({
+                    url: '/logout',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify(''),
+                    beforeSend: function setAuthHeader(xhr){
+                        xhr.setRequestHeader('Authorization', readCookie("token"));
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            eraseCookie("token");
+                            window.location = "/static/login.html";
+                        } else {
+                            viewError(jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
+            });
+
+            $('#insert_data').submit(function(e) {
+                var data = getFormData($(this));
+                var err = "";
+                clearError();
+
+                if (data.key == "") {
+                    viewError("Key is required field");
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/value',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    beforeSend: function setAuthHeader(xhr){
+                        xhr.setRequestHeader('Authorization', readCookie("token"));
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            $('#login-form-link').trigger( "click" );
+                        } else {
+                            viewError("register", jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
+            });
+
+            $('#insert_data').submit(function(e) {
+                var data = getFormData($(this));
+                var err = "";
+                clearError();
+
+                if (data.key == "") {
+                    viewError("Key is required field");
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/value/'+data.Key,
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    beforeSend: function setAuthHeader(xhr){
+                        xhr.setRequestHeader('Authorization', readCookie("token"));
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            $('#login-form-link').trigger( "click" );
+                        } else {
+                            viewError("register", jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
+            });
+
+            $('#get_data').submit(function(e) {
+                var data = getFormData($(this));
+                var err = "";
+                clearError();
+
+                if (data.key == "") {
+                    viewError("Key is required field");
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/value/'+data.Key,
+                    method: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    beforeSend: function setAuthHeader(xhr){
+                        xhr.setRequestHeader('Authorization', readCookie("token"));
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            $('#login-form-link').trigger( "click" );
+                        } else {
+                            viewError("register", jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
+            });
+
+            $('#delete_data').submit(function(e) {
+                var data = getFormData($(this));
+                var err = "";
+                clearError();
+
+                if (data.key == "") {
+                    viewError("Key is required field");
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/value/'+data.key,
+                    method: 'DELETE',
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function setAuthHeader(xhr){
+                        xhr.setRequestHeader('Authorization', readCookie("token"));
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            $('#login-form-link').trigger( "click" );
+                        } else {
+                            viewError("register", jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
+            });
+        });
+
+        function setAuthHeader(xhr){
+            xhr.setRequestHeader('Authorization', readCookie("token"));
+        }
+
+        function checkToken(){
+            if (!readCookie("token")) {
+                window.location = "/static/login.html";
+            }
+        }
+
+        function getFormData($form){
+            var unindexed_array = $form.serializeArray();
+            var indexed_array = {};
+
+            $.map(unindexed_array, function(n, i){
+                indexed_array[n['name']] = n['value'];
+            });
+
+            return indexed_array;
+        }
+
+        function viewError(text) {
+            $('#form-error').show().html(text);
+        }
+
+        function clearError() {
+            $('#form-error').hide().html('');
+        }
+
+        function createCookie(name, value, days) {
+            var expires;
+
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            } else {
+                expires = "";
+            }
+            document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+        }
+
+        function readCookie(name) {
+            var nameEQ = encodeURIComponent(name) + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        }
+
+        function eraseCookie(name) {
+            createCookie(name, "", -1);
+        }
+
+    </script>
 </body>
 </html>

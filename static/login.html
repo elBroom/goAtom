@@ -133,6 +133,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <form id="login-form" role="form" style="display: block;">
+                                    <div id="login-form-error" class="alert alert-danger" style="display: none;"></div>
                                     <div class="form-group">
                                         <input type="text" name="login" id="login" tabindex="1" class="form-control" placeholder="Login" value="">
                                     </div>
@@ -195,56 +196,79 @@
 
             $('#login-form').submit(function(e) {
                 var data = getFormData($(this));
-                clearError("login");
-
-                if (data.login != "") {
-                    returnviewError("register", "Login is required field");
-                    return;
-                }
-                if (data.password != "") {
-                    viewError("register", "Password is required field");
-                    return;
-                }
-
-                debugger;
-                return false;
-            });
-
-            $('#register-form').submit(function(e) {
-                var data = getFormData($(this));
+                var err = "";
                 clearError("register");
 
-                if (data.login != "") {
-                    returnviewError("register", "Login is required field");
-                    return;
-                }
-                if (data.password != "") {
-                    viewError("register", "Password is required field");
-                    return;
-                }
-                if (data.confirm_password != "") {
-                    viewError("register", "Confirm Password is required field");
-                    return;
+                if (data.login == "") {
+                    err = "Login is required field";
+                } else if (data.password == "") {
+                    err = "Password is required field";
                 }
 
-                if (data.password != data.confirm_password ) {
-                    viewError("register", "Password and Confirm Password not equals");
-                    return;
+                if (err) {
+                    viewError("login", err);
+                    return false;
                 }
 
                 $.ajax({
-                    url: '/user',
+                    url: '/login',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
                     dataType: 'json',
-                    data: data,
+                    data: JSON.stringify(data),
                     success: function(data, textStatus, jqXHR) {
                         debugger;
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        debugger;
-                        viewError("Error");
+                        if (jqXHR.responseText == "ok") {
+                            createCookie("token", jqXHR.getResponseHeader('Authorization'), 1);
+                            window.location = "/static/index.html";
+                        } else {
+                            viewError("login", jqXHR.responseText);
+                        }
                     }
                 });
-                return false;
+                e.preventDefault(e);
+            });
+
+            $('#register-form').submit(function(e) {
+                var data = getFormData($(this));
+                var err = "";
+                clearError("register");
+
+                if (data.login == "") {
+                    err = "Login is required field";
+                } else if (data.password == "") {
+                    err = "Password is required field";
+                } else if (data.confirm_password == "") {
+                    err = "Confirm Password is required field";
+                } else if (data.password != data.confirm_password ) {
+                    err = "Password and Confirm Password not equals";
+                }
+
+                if (err) {
+                    viewError("register", err);
+                    return false;
+                }
+
+                $.ajax({
+                    url: '/user',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    success: function(data, textStatus, jqXHR) {
+                        debugger;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText == "ok") {
+                            $('#login-form-link').trigger( "click" );
+                        } else {
+                            viewError("register", jqXHR.responseText);
+                        }
+                    }
+                });
+                e.preventDefault(e);
             });
         });
 
@@ -263,10 +287,22 @@
             $('#'+context+'-form-error').show().html(text);
         }
 
-        function clearError(context, text) {
+        function clearError(context) {
             $('#'+context+'-form-error').hide().html('');
         }
 
+        function createCookie(name, value, days) {
+            var expires;
+
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            } else {
+                expires = "";
+            }
+            document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+        }
     </script>
 </body>
 </html>
