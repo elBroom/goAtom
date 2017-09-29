@@ -1,7 +1,7 @@
 # HTTP интерфейс для редиски
 Репозиторий для курса Go
 
-Ссылка на проект http://elbroom.ru:6060/
+Ссылка на проект http://goatom.elbroom.ru/
 
 Ссылка на презентацию https://gitpitch.com/elBroom/goAtom/master?grs=github&t=black&p=presentation
 
@@ -38,11 +38,11 @@ PUT
   * Журнал запросов
 
 
-  
+
  Архитектура
  * RESTFull
  * Database redis, postgres
- 
+
 ```
 DataStructure:
 
@@ -52,19 +52,19 @@ user
     login
     password
     name
-    
+
 token
     id
     ...
     token
     user_id
-        
+
 user_log
     id
     created_at
     ...
     user_id
-    
+
 query_log
     id
     created_at
@@ -91,7 +91,7 @@ query_log
   1. ~~UI для работы с редис~~
   1. ~~UI для работы с журналом~~
   1. Презентация
-  
+
  ```
  Регистрация
  curl -X POST \
@@ -102,7 +102,7 @@ query_log
  	"password": "test",
  	"name": "power"
  }'
- 
+
  Логин
  curl -X POST \
    http://localhost:8080/login \
@@ -111,7 +111,7 @@ query_log
  	"login": "test2",
  	"password": "test"
  }'
- 
+
  Создать значение
  curl -X POST \
    http://localhost:8080/value/ \
@@ -122,7 +122,7 @@ query_log
 	"value": "123",
 	"expiration":20
  }'
- 
+
  Изменить значение
  curl -X PUT \
    http://localhost:8080/value/test \
@@ -133,7 +133,7 @@ query_log
  	"value": "456"б
  	"expiration":20
  }'
- 
+
 Получить значение
  curl -X GET \
    http://localhost:8080/value/test \
@@ -143,12 +143,12 @@ query_log
 curl -X DELETE \
   http://localhost:8080/value/test \
   -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
-  
+
 Получить историю запросо
  curl -X GET \
    http://localhost:8080/history \
    -H 'authorization: 35d7dbbe-4783-47b7-9890-ee7eb56c0b01'
-   
+
 Логаут
 curl -X POST \
   http://localhost:8080/logout \

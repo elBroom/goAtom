@@ -5,7 +5,7 @@
   * Сайфуллина Зарина (@elBroom)
   * Баранов Михаил (@kinetikm)
 
-[http://elbroom.ru:6060](http://elbroom.ru:6060)
+[http://goatom.elbroom.ru](http://goatom.elbroom.ru)
 
 #HSLIDE
 ### Реализовано
@@ -33,7 +33,7 @@
   * Токены
   * Журнал входа
   * Журнал запросов
-  
+
 #HSLIDE
 ### Схема
 <img src="presentation/assets/img/schema.jpg" alt="schema"/>
@@ -64,7 +64,7 @@ PUT
 ```
 
 #HSLIDE
-[http://elbroom.ru:6060/login](http://elbroom.ru:6060/login)
+[http://goatom.elbroom.ru/login](http://goatom.elbroom.ru/login)
 
 #HSLIDE
 ### Спасибо за внимание
